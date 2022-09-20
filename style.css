@@ -1,0 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Montserrat:wght@100&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  font-family: "Montserrat", sans-serif;
+}
+
+.page-header {
+  height: 5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: olivedrab;
+}
+
+.to-do-add {
+  max-width: 35ch;
+  margin: auto;
+  padding: 2em 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 3rem;
+}
+
+#new-todo {
+  outline: 1.5px solid;
+}
+#todo-list {
+  list-style: none;
+}
+.your-todos > h2 {
+  margin-bottom: 1em;
+}
+
+.todo-list__element {
+  margin: 0.5em 0em;
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+  border-radius: 5px;
+}
