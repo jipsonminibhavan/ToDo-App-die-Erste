@@ -1,95 +1,122 @@
-const newInput = document.querySelector("#new-todo");
-const delbtn = document.querySelector("#btn-delete");
-const addbtn = document.querySelector("#btn-add");
-const todoList = document.querySelector("#todo-list");
-const API_URL = "http://localhost:4730/todos";
-
+const apiURL = "http://localhost:4730/todos/";
+const btnAddTodo = document.querySelector("#add-todo");
+const btnDelDone = document.querySelector("#del-done");
 let todos = [];
 
-function loadTodos() {
-  fetch(API_URL).then((response) => response.json());
-  then((todosFromApi) => {
-    todos = todosFromApi;
-    renderTodos();
-  });
-}
+//let todos = JSON.parse(localStorage.getItem("todos") || [] -> macht if schleife unnöttig
 
-function renderTodos() {
-  todoList.textContent = ""; //alles was vorher ist wird gelöscht
+let filterDoneisActive = false;
+let filterOpenisActive = false;
+getData();
 
-  // Für jedes Todo wird ein Eintrag erzeugt inkl. Checkbox
-  todoList.forEach((todo) => {
-    const todoLi = document.createElement("li");
+btnAddTodo.addEventListener("click", addTodo);
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = todo.done;
-    todoLi.appendChild(checkbox);
+document.getElementById("done").addEventListener("change", () => {
+  filterDoneisActive = true;
+  filterOpenisActive = false;
+  render();
+});
 
-    const todoText = document.createTextNode(todo.description);
-    todoLi.append(todoText);
+document.getElementById("open").addEventListener("change", () => {
+  filterOpenisActive = true;
+  filterDoneisActive = false;
+  render();
+});
 
-    todoList.setAttribute("data-id", todo.id);
-    todoList.appendChild(todoLi);
-  });
-}
+document.getElementById("all").addEventListener("change", () => {
+  filterOpenisActive = false;
+  filterDoneisActive = false;
+  render();
+});
 
-function addToDo() {
-  newInput.value = "";
-
-  if (newInput.length > 0) {
-    const newTodo = {
-      description: newInput.value,
-      done: false,
-    };
-    fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(newTodo),
-    })
-      .then((response) => response.json())
-      .then((newTodoFromApi) => {
-        todos.push(newTodoFromApi);
-        renderTodos();
-      });
+async function addTodo() {
+  const todoDescription = document.querySelector("#todo-description");
+  if (todoDescription.value < 3) {
+    return;
   }
+  let newTodo = { description: todoDescription.value, done: false };
+  const response = await fetch(apiURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(newTodo),
+  });
+  const data = await response.json();
+
+  todos.push(data);
+
+  todoDescription.value = "";
+  todoDescription.focus();
+  render();
 }
 
-function updateTodo(e) {}
-const id = e.target.parentElement.getAttribute("data-id");
-const updateTodo = {
-  description: e.target.nextSibling.textContent,
-  done: e.target.checked,
-};
+async function getData() {
+  const response = await fetch(apiURL);
+  const data = await response.json();
 
-fetch(API_URL, {
-  method: "PUT",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(updateTodo),
-})
-  .then((response) => response.json())
-  .then(() => {
-    loadTodos();
-  });
-
-function deleteTodos() {
-  todos.forEach((todo) => {
-    if (todo.done === true) {
-      fetch(API_URL + todo.id, {
-        method: "DELETE",
-      })
-        .then((response) => response.json())
-        .then(() => {
-          loadTodos();
-        });
-    }
-  });
+  todos = data;
+  render();
 }
 
-addbtn.addEventListener("click", addToDo);
-list.addEventListener("change", updateTodo);
-delbtn.addEventListener("click", deleteTodos);
+function render() {
+  const list = document.querySelector("#todos-output");
+  list.innerHTML = "";
 
-loadTodos();
+  let todoList = [];
+
+  if (filterDoneisActive) {
+    todoList = filterDones();
+  } else if (filterOpenisActive) {
+    todoList = filterOpens();
+  } else {
+    todoList = todos;
+  }
+  todoList.forEach((todo) => {
+    const listEl = document.createElement("li");
+    const checkboxEl = document.createElement("input");
+    const labelEl = document.createElement("label");
+    checkboxEl.setAttribute("type", "checkbox");
+    checkboxEl.value = todo.description;
+    checkboxEl.checked = todo.done;
+    checkboxEl.setAttribute("id", "id-" + todo.id);
+    labelEl.setAttribute("for", "id-" + todo.id);
+    labelEl.innerText = todo.description;
+    listEl.append(checkboxEl);
+    listEl.append(labelEl);
+    list.append(listEl);
+
+    checkboxEl.addEventListener("change", function () {
+      todo.done = !todo.done;
+      onCheckboxChange(todo.id, todo);
+    });
+  });
+}
+async function onCheckboxChange(id, todo) {
+  const response = await fetch(apiURL + id, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(todo),
+  });
+  const data = await response.json();
+}
+
+function filterDones() {
+  return todos.filter((todo) => todo.done === true);
+}
+
+function filterOpens() {
+  return todos.filter((todo) => todo.done === false);
+}
+
+btnDelDone.addEventListener("click", delToDo);
+
+async function delToDo() {
+  todoList = filterDones();
+  todoList.forEach((todo) => {
+    fetch(apiURL + todo.id, {
+      method: "DELETE",
+    });
+  });
+  getData();
+}
