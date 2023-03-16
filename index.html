@@ -5,34 +5,46 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToDo-App With API</title>
-    <link rel="stylesheet" href="style.css" />
-
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Spartan:wght@300&display=swap" rel="stylesheet" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <header class="page-header">
-        <h1>To-do-App-With-Api </h1>
+    <header>
+        <h1>Todo App</h1>
     </header>
     <main>
+        <form id="input-wrapper" onsubmit="return false">
+            <input type="text" placeholder="Get sh*t done!" id="todo-description">
+            <label for="todo-description" class="visually-hidden">Get sh*t done!</label>
+            <button id="add-todo">Add</button>
+        </form>
 
-        <div class="to-do-add">
-            <section class="add-todos">
-                <input type="text" class="txt" required minlength="3" id="new-todo" />
-                <label for="new-todo"></label>
-                <button id="btn-add">Add</button>
-            </section>
-            <button class="btn" id="
-            "> Remove Done Todos</button>
-            <section class="your-todos">
-                <h2>Your Todos</h2>
-                <ul id="todo-list"></ul>
-            </section>
-        </div>
+        <h2>Filter & Options</h2>
+        <form class="radios">
+            <input type="radio" id="all" name="all" value="all" checked>
+            <label for="all">All</label><br>
+            <input type="radio" id="open" name="all" value="open">
+            <label for="open">Open</label><br>
+            <input type="radio" id="done" name="all" value="done">
+            <label for="done">Done</label>
+        </form>
+
+
+        <button id="del-done" onsubmit="return false">Remove Done Todo's</button>
+
+        <h3> Your Todos</h3>
+
+        <ul id="todos-output">
+
+        </ul>
+
+
+
+
     </main>
     <script src="script.js"></script>
+
 </body>
 
 </html>
